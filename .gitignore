@@ -1,0 +1,19 @@
+# Packaging
+*.pyc
+__pycache__
+*.egg-info
+/dist/
+/build/
+
+# Base
+*.sqlite3
+.DS_Store
+.idea
+__pycache__
+
+# Migrations
+**/migrations/*
+!**/migrations/__init__.py
+
+# vscode
+*.vscode/
