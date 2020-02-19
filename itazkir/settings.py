@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'graphene_django',
     'accounts',
+    'reminder',
 ]
 
 MIDDLEWARE = [
@@ -87,7 +88,7 @@ WSGI_APPLICATION = 'itazkir.wsgi.application'
 
 DATABASES = {
     "default": dj_database_url.config(
-        default=os.environ.get("DATABASE_URL"), conn_max_age=600        
+        default=os.environ.get("DATABASE_URL"), conn_max_age=600    
     )
 }
 
@@ -95,6 +96,7 @@ GRAPHENE = {
     'SCHEMA': 'itazkir.schema.schema',
     'MIDDLEWARE': [
         'graphql_jwt.middleware.JSONWebTokenMiddleware',
+        'graphene_django.debug.DjangoDebugMiddleware',
     ],
 }
 
