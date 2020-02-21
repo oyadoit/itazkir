@@ -31,14 +31,22 @@ class CreateUser(graphene.Mutation):
         user.set_password(password)
         user.save()
 
-        return CreateUser(user=user) 
+        return CreateUser(user=user)
 
 
 class Query(graphene.ObjectType):
     users = graphene.List(UserType)
+    current_user = graphene.Field(UserType)
 
     def resolve_users(self, info):
         return get_user_model().objects.all()
+    
+    def resolve_current_user(self, info):
+        user = info.context.user
+        if user.is_anonymous:
+            raise Exception('Not logged in')
+        
+        return user
     
 
 
