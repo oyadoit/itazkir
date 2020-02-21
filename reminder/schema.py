@@ -1,6 +1,7 @@
 import graphene
 from graphene_django import DjangoObjectType
 from reminder.models import Reminder
+from graphql import GraphQLError
 
 
 from reminder.models import Reminder
@@ -15,8 +16,15 @@ class Query(graphene.ObjectType):
     all_reminders = graphene.List(ReminderType, description="All the Reminder present")
     reminder = graphene.Field(ReminderType, id=graphene.Int(), name=graphene.String(), description="Single reminder")
 
-    # user_reminders = graphene.List(ReminderType, owner=)
-    # user_reminder = graphene.Field(ReminderType, id=graphene.Int(), )
+    user_reminders = graphene.List(ReminderType, description="Get reminders created for the current user")
+
+    def resolve_user_reminders(self, info, **kwargs):
+        user = info.context.user or None
+        
+        if user.is_anonymous:
+            raise GraphQLError("Anonymous users don't have reminders")
+        # FIXME: Handle when reminder is empty for users (Maybe maybe not)
+        return Reminder.objects.filter(owner=user)
 
     def resolve_all_reminders(self, info, **kwargs):
         return Reminder.objects.all()
@@ -26,7 +34,8 @@ class Query(graphene.ObjectType):
             return Reminder.objects.get(pk=id)
 
 class CreateReminder(graphene.Mutation):
-    user = graphene.Field(UserType)
+    id = graphene.Int()
+    owner = graphene.Field(UserType)
     name = graphene.String()
 
     class Arguments:
