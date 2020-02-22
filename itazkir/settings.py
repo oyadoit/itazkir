@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'graphene_django',
     'accounts',
     'reminder',
+    'content',
 ]
 
 MIDDLEWARE = [
