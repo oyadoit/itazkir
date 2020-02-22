@@ -1,7 +1,8 @@
 import graphene
 from graphene_django import DjangoObjectType
-from reminder.models import Reminder
 from graphql import GraphQLError
+
+from reminder.models import Reminder
 
 
 from reminder.models import Reminder
@@ -29,9 +30,11 @@ class Query(graphene.ObjectType):
     def resolve_all_reminders(self, info, **kwargs):
         return Reminder.objects.all()
     
-    def resolve_reminder(self, info, id=None):
+    def resolve_reminder(self, info, id=None, name=None):
         if id is not None:
             return Reminder.objects.get(pk=id)
+        if name is not None:
+            return Reminder.objects.filter(name=name).first()
 
 class CreateReminder(graphene.Mutation):
     id = graphene.Int()
