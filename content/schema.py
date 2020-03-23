@@ -13,7 +13,7 @@ class ContentType(DjangoObjectType):
 
 
 class Query(graphene.ObjectType):
-    all_contents = graphene.List(ContentType, description="All contents avaialble")
+    all_contents = graphene.List(ContentType, description="All contents available")
     content = graphene.Field(ContentType, id=graphene.Int(), title=graphene.String(), description="The content for a given id")
     reminder_content = graphene.List(ContentType, reminder_id=graphene.Int(), description="The contents for a given reminder")
 
@@ -57,6 +57,6 @@ class CreateContent(graphene.Mutation):
             reminder=content.reminder
         )
 
-    
+
 class Mutation(graphene.ObjectType):
     create_content = CreateContent.Field()
