@@ -5,6 +5,7 @@ from subscription.models import Subscription
 
 from accounts.schema import UserType
 from reminder.schema import ReminderType
+from content.schema import ContentType
 
 from reminder.models import Reminder
 
@@ -21,11 +22,20 @@ class Query(graphene.ObjectType):
         SubscriptionType, description="Get all the subscriptions for a given user"
     )
 
-    def resolve_user_subscription(self, info, **kwargs):
+    user_contents = graphene.List(ContentType, description="Get subscription content for a user")
+
+    def resolve_user_subscriptions(self, info, **kwargs):
         user = info.context.user or None
+        # import pdb; pdb.set_trace()
         if user.is_anonymous:
             raise GraphQLError("Anonymous users don't have subscriptions")
         return Subscription.objects.filter(user=user)
+    
+    def resolve_user_contents(self, info, **kwargs):
+        user = info.context.user or None
+        if user.is_anonymous:
+            raise GraphQLError("Anonymouse users don't have subscribed content")
+        
 
 
 class CreateSubscription(graphene.Mutation):
