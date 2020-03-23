@@ -54,7 +54,7 @@ class CreateReminder(graphene.Mutation):
             owner=reminder.owner,
             name=reminder.name
         )
-    
+
 
 class Mutation(graphene.ObjectType):
     create_reminder = CreateReminder.Field()
