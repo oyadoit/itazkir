@@ -8,6 +8,7 @@ from accounts.models import User
 class UserType(DjangoObjectType):
     class Meta:
         model = User
+        exclude = ('password',)
 
 
 
@@ -21,7 +22,7 @@ class CreateUser(graphene.Mutation):
         email = graphene.String(required=True)
         phone = graphene.String()
 
-    def mutate(self, info, first_name, last_name, password, email, phone):
+    def mutate(self, info, first_name, last_name, password, email, phone=None):
         user = User(
             first_name=first_name,
             last_name=last_name,
