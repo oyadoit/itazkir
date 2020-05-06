@@ -8,6 +8,7 @@ from reminder.schema import ReminderType
 from content.schema import ContentType
 
 from reminder.models import Reminder
+from content.models import Content
 
 
 
@@ -32,9 +33,20 @@ class Query(graphene.ObjectType):
         return Subscription.objects.filter(user=user)
     
     def resolve_user_contents(self, info, **kwargs):
+        # TODO: Optimize this resolver. This is temporary to unblock the frontend
         user = info.context.user or None
         if user.is_anonymous:
             raise GraphQLError("Anonymouse users don't have subscribed content")
+
+        user_subscriptions = Subscription.objects.filter(user=user)
+        
+        contents = []
+        for subscription in user_subscriptions:
+            contents.extend(Content.objects.filter(reminder=subscription.reminder))
+        return contents
+
+
+        
         
 
 
