@@ -1,15 +1,21 @@
 import graphene
+import graphql_jwt
 from django.contrib.auth import get_user_model
 from graphene_django import DjangoObjectType
 
 from accounts.models import User
+from reminder.models import Reminder
 
 
 class UserType(DjangoObjectType):
     class Meta:
         model = User
         exclude = ('password',)
+    is_creator = graphene.Boolean()
 
+    def resolve_is_creator(self, info):
+        reminder = Reminder.objects.filter(owner=self).first()
+        return True if reminder else False
 
 
 class CreateUser(graphene.Mutation):
@@ -44,10 +50,11 @@ class Query(graphene.ObjectType):
     
     def resolve_current_user(self, info):
         user = info.context.user
+
         if user.is_anonymous:
             raise Exception('Not logged in')
-        
         return user
+
     
 
 
