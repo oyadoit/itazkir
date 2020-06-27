@@ -4,7 +4,7 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, Permis
 
 class UserManager(BaseUserManager):
     def create_user(
-        self, email, password=None, is_staff=False, is_active=True, **extra_fields
+            self, email, password=None, is_staff=False, is_active=True, **extra_fields
     ):
         """Create a user instance with the given email and password."""
         email = self.normalize_email(email)
@@ -18,12 +18,11 @@ class UserManager(BaseUserManager):
             user.set_password(password)
         user.save()
         return user
-    
+
     def create_superuser(self, email, password=None, **extra_fields):
         return self.create_user(
             email, password, is_staff=True, is_superuser=True, **extra_fields
-        )    
-
+        )
 
 
 class User(AbstractBaseUser, PermissionsMixin):
