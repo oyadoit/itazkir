@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'content',
     'subscription',
     'corsheaders',
+    'cloudinary',
 ]
 
 MIDDLEWARE = [
