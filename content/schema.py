@@ -2,6 +2,11 @@ import graphene
 from graphene_django import DjangoObjectType
 from content.models import Content
 from graphql import GraphQLError
+from graphene_file_upload.scalars import Upload
+
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 
 
 from reminder.models import Reminder
@@ -36,25 +41,36 @@ class CreateContent(graphene.Mutation):
     id = graphene.Int()
     data = graphene.String()
     title = graphene.String()
+    file_location = graphene.String()
     reminder = graphene.Field(ReminderType)
 
     class Arguments:
         reminder_id = graphene.Int()
         data = graphene.String()
         title = graphene.String()
-    
-    def mutate(self, info, reminder_id, data, title):
+        file = Upload()
+
+    def mutate(self, info, **kwargs):
+        reminder_id = kwargs.get('reminder_id')
+        data = kwargs.get('data')
+        title = kwargs.get('title')
+        file = kwargs.get('file')
         reminder = Reminder.objects.get(pk=reminder_id)
         if not reminder:
             raise Exception('Invalid Reminder')
         content = Content(reminder=reminder, data=data, title=title)
+        if file:
+            upload_response = cloudinary.uploader.upload(file)
+            content.content_image = upload_response.get('secure_url')
+
         content.save()
 
         return CreateContent(
             id=content.id,
             data=content.data,
             title=title,
-            reminder=content.reminder
+            reminder=content.reminder,
+            file_location=content.content_image
         )
 
 
