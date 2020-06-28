@@ -56,6 +56,7 @@ class CreateContent(graphene.Mutation):
         title = kwargs.get('title')
         file = kwargs.get('file')
         reminder = Reminder.objects.get(pk=reminder_id)
+        # TODO: Content canonly be created by who owned the reminder
         if not reminder:
             raise Exception('Invalid Reminder')
         content = Content(reminder=reminder, data=data, title=title)
@@ -73,6 +74,46 @@ class CreateContent(graphene.Mutation):
             file_location=content.content_image
         )
 
+class UpdateContent(graphene.Mutation):
+    id = graphene.Int()
+    data = graphene.String()
+    title = graphene.String()
+    file_location = graphene.String()
+    reminder = graphene.Field(ReminderType)
+
+    class Arguments:
+        id = graphene.Int()
+        data = graphene.String()
+        title = graphene.String()
+        file = Upload()
+
+    def mutate(self, info, **kwargs):
+        content_id = kwargs.get('id')
+        data = kwargs.get('data')
+        title = kwargs.get('title')
+        file = kwargs.get('file')
+        content = Content.objects.get(pk=content_id)
+        # TODO: Content canonly be created by who owned the reminder
+        if not content:
+            raise Exception('Invalid Content')
+        content.title = title if title else content.title
+        content.data = data if data else content.data
+
+        if file:
+            upload_response = cloudinary.uploader.upload(file)
+            content.content_image = upload_response.get('secure_url')
+
+        content.save()
+
+        return UpdateContent(
+            id=content.id,
+            data=content.data,
+            title=title,
+            reminder=content.reminder,
+            file_location=content.content_image
+        )
+
 
 class Mutation(graphene.ObjectType):
     create_content = CreateContent.Field()
+    update_content = UpdateContent.Field()
