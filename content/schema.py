@@ -114,6 +114,26 @@ class UpdateContent(graphene.Mutation):
         )
 
 
+class DeleteContent(graphene.Mutation):
+    message = graphene.String()
+
+    class Arguments:
+        id = graphene.Int()
+
+    def mutate(self, info, **kwargs):
+        content_id = kwargs.get('id')
+        content = Content.objects.get(pk=content_id)
+        content.delete()
+
+        return DeleteContent(
+            message='Successfully deleted'
+        )
+
+
+
+
 class Mutation(graphene.ObjectType):
     create_content = CreateContent.Field()
     update_content = UpdateContent.Field()
+    delete_content = DeleteContent.Field()
+
