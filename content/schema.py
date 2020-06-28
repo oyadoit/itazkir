@@ -93,6 +93,7 @@ class UpdateContent(graphene.Mutation):
         file = Upload()
 
     def mutate(self, info, **kwargs):
+        user = info.context.user or None
         content_id = kwargs.get('id')
         data = kwargs.get('data')
         title = kwargs.get('title')
@@ -101,6 +102,9 @@ class UpdateContent(graphene.Mutation):
         # TODO: Content canonly be created by who owned the reminder
         if not content:
             raise Exception('Invalid Content')
+        if content.reminder.owner != user:
+            raise Exception(f'Unauthorized user cannot edit content for {content.reminder.name}')
+
         content.title = title if title else content.title
         content.data = data if data else content.data
 
