@@ -99,7 +99,6 @@ class UpdateContent(graphene.Mutation):
         title = kwargs.get('title')
         file = kwargs.get('file')
         content = Content.objects.get(pk=content_id)
-        # TODO: Content canonly be created by who owned the reminder
         if not content:
             raise Exception('Invalid Content')
         if content.reminder.owner != user:
@@ -130,8 +129,13 @@ class DeleteContent(graphene.Mutation):
         id = graphene.Int()
 
     def mutate(self, info, **kwargs):
+        user = info.context.user or None
         content_id = kwargs.get('id')
         content = Content.objects.get(pk=content_id)
+        reminder = content.reminder
+        if reminder.owner != user:
+            raise Exception(f'Unauthorized user cannot delete content')
+
         content.delete()
 
         return DeleteContent(
