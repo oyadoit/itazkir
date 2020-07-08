@@ -7,6 +7,8 @@ from reminder.models import Reminder
 
 from reminder.models import Reminder
 from accounts.schema import UserType
+from subscription.models import Subscription
+
 
 class ReminderType(DjangoObjectType):
     class Meta:
@@ -48,6 +50,8 @@ class CreateReminder(graphene.Mutation):
         user = info.context.user or None
         reminder = Reminder(name=name, owner=user)
         reminder.save()
+        subscription = Subscription(reminder=reminder, user=user)
+        subscription.save()
 
         return CreateReminder(
             id=reminder.id,
