@@ -69,6 +69,27 @@ class CreateSubscription(graphene.Mutation):
         )
 
 
+class UnsubscribeReminder(graphene.Mutation):
+    message = graphene.String()
+
+    class Arguments:
+        reminder_id = graphene.Int()
+
+    def mutate(self, info, reminder_id):
+        user = info.context.user or None
+        reminder = Reminder.objects.get(pk=reminder_id)
+        if not user:
+            raise Exception('user not logged in')
+        if not reminder:
+            raise Exception("invalid Reminder")
+        subscription = Subscription.objects.filter(reminder=reminder, user=user)
+        subscription.delete()
+
+        return UnsubscribeReminder(
+            message=f'You have successfully subscribed from {reminder.name}'
+        )
+
 
 class Mutation(graphene.ObjectType):
     create_subscription = CreateSubscription.Field()
+    unsubscribe_reminder = UnsubscribeReminder.Field()
