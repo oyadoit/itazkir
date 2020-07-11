@@ -11,12 +11,10 @@ from reminder.models import Reminder
 from content.models import Content
 
 
-
 class SubscriptionType(DjangoObjectType):
-
     class Meta:
         model = Subscription
-    
+
 
 class Query(graphene.ObjectType):
     user_subscriptions = graphene.List(
@@ -31,7 +29,7 @@ class Query(graphene.ObjectType):
         if user.is_anonymous:
             raise GraphQLError("Anonymous users don't have subscriptions")
         return Subscription.objects.filter(user=user)
-    
+
     def resolve_user_contents(self, info, **kwargs):
         # TODO: Optimize this resolver. This is temporary to unblock the frontend
         user = info.context.user or None
@@ -39,15 +37,11 @@ class Query(graphene.ObjectType):
             raise GraphQLError("Anonymouse users don't have subscribed content")
 
         user_subscriptions = Subscription.objects.filter(user=user)
-        
+
         contents = []
         for subscription in user_subscriptions:
             contents.extend(Content.objects.filter(reminder=subscription.reminder))
         return contents
-
-
-        
-        
 
 
 class CreateSubscription(graphene.Mutation):
@@ -57,7 +51,7 @@ class CreateSubscription(graphene.Mutation):
 
     class Arguments:
         reminder_id = graphene.Int()
-    
+
     def mutate(self, info, reminder_id):
         user = info.context.user or None
         reminder = Reminder.objects.get(pk=reminder_id)
@@ -68,7 +62,7 @@ class CreateSubscription(graphene.Mutation):
 
         return CreateSubscription(
             id=subscription.id,
-            user= subscription.user,
+            user=subscription.user,
             reminder=subscription.reminder
         )
 
