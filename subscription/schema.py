@@ -55,6 +55,8 @@ class CreateSubscription(graphene.Mutation):
     def mutate(self, info, reminder_id):
         user = info.context.user or None
         reminder = Reminder.objects.get(pk=reminder_id)
+        if not user:
+            raise Exception('user not logged in')
         if not reminder:
             raise Exception("invalid Reminder")
         subscription = Subscription(reminder=reminder, user=user)
