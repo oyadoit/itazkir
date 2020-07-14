@@ -18,14 +18,22 @@ class ContentType(DjangoObjectType):
 
 
 class Query(graphene.ObjectType):
-    all_contents = graphene.List(ContentType, description="All contents available")
+    all_contents = graphene.List(ContentType, first=graphene.Int(),
+        skip=graphene.Int(), description="All contents available")
     content = graphene.Field(ContentType, id=graphene.Int(), title=graphene.String(),
                              description="The content for a given id")
     reminder_content = graphene.List(ContentType, reminder_id=graphene.Int(),
                                      description="The contents for a given reminder")
 
-    def resolve_all_contents(self, info, **kwargs):
-        return Content.objects.all()
+    def resolve_all_contents(self, info, first=None, skip=None, **kwargs):
+        qs = Content.objects.all()
+        if skip:
+            qs = qs[skip:]
+        if first:
+            qs = qs[:first]
+
+        # return Content.objects.all()
+        return qs
 
     def resolve_reminder_content(self, info, reminder_id=None):
         if reminder_id is not None:
