@@ -19,7 +19,7 @@ class ContentType(DjangoObjectType):
 
 class Query(graphene.ObjectType):
     all_contents = graphene.List(ContentType, first=graphene.Int(),
-        skip=graphene.Int(), description="All contents available")
+                                 skip=graphene.Int(), description="All contents available")
     content = graphene.Field(ContentType, id=graphene.Int(), title=graphene.String(),
                              description="The content for a given id")
     reminder_content = graphene.List(ContentType, reminder_id=graphene.Int(),
@@ -69,6 +69,8 @@ class CreateContent(graphene.Mutation):
         reminder = Reminder.objects.get(pk=reminder_id)
         if not reminder:
             raise Exception('Invalid Reminder')
+        if not reminder.is_approved:
+            raise Exception('Reminder Needs to be approved before you can create content')
         if reminder.owner != user:
             raise Exception(f'Unauthorized user cannot create content for {reminder.name}')
         content = Content(reminder=reminder, data=data, title=title)
