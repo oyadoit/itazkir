@@ -14,7 +14,7 @@ class UserType(DjangoObjectType):
     is_creator = graphene.Boolean()
 
     def resolve_is_creator(self, info):
-        reminder = Reminder.objects.filter(owner=self).first()
+        reminder = Reminder.objects.filter(owner=self, is_approved=True).first()
         return True if reminder else False
 
 
