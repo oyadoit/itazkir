@@ -3,6 +3,7 @@ from graphene_django import DjangoObjectType
 from graphql import GraphQLError
 
 from reminder.models import Reminder
+from content.models import Content
 
 
 from reminder.models import Reminder
@@ -13,6 +14,11 @@ from subscription.models import Subscription
 class ReminderType(DjangoObjectType):
     class Meta:
         model = Reminder
+    count = graphene.Int()
+
+    def resolve_count(self, info):
+        count = Content.objects.filter(reminder=self).count()
+        return count
 
 
 class Query(graphene.ObjectType):
